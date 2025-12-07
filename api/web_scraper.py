@@ -9,7 +9,9 @@ class NewScraper:
 
     def scrape_page(self, limit):
         """Scrape the first `limit` news items across multiple pages."""
-
+        # Safeguard limit
+        limit = min(1000,limit)
+        print(f"Scraping up to {limit} news items...")
         # Clear previous data before new scrape
         self.all_news = []
         
@@ -72,5 +74,5 @@ class NewScraper:
 
 if __name__ == "__main__":
     scraper = NewScraper()
-    news = scraper.scrape_page(100)
+    news = scraper.scrape_page(1500)
     print(news)
