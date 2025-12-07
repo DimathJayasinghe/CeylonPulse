@@ -1,0 +1,3 @@
+[submodule "web-news-scraper-"]
+	path = web-news-scraper-
+	url = https://github.com/DimathJayasinghe/web_news_scraper-.git
