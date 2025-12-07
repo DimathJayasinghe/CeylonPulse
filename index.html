@@ -41,7 +41,7 @@
         list.innerHTML = '';
         errorEl.hidden = true;
         statusEl.textContent = 'Loading…';
-        const limit = Math.max(1, Math.min(50, Number(limitInput.value || 10)));
+        const limit = Math.max(1, Math.min(1000, Number(limitInput.value || 10)));
 
         try {
           const res = await fetch(`/api/news?limit=${limit}`);
