@@ -10,6 +10,9 @@ class NewScraper:
     def scrape_page(self, limit):
         """Scrape the first `limit` news items across multiple pages."""
 
+        # Clear previous data before new scrape
+        self.all_news = []
+        
         page_no = 1  # Adaderana starts at page 1
         collected = 0
 

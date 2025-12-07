@@ -1,54 +1,95 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CeylonPulse News</title>
-    <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
-      h1 { margin-bottom: 0.5rem; }
-      .controls { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
-      input[type=number] { width: 6rem; padding: 0.4rem; }
-      button { padding: 0.5rem 0.8rem; cursor: pointer; }
-      ul { list-style: none; padding: 0; }
-      li { padding: 0.6rem 0; border-bottom: 1px solid #eee; }
-      .date { color: #666; font-size: 0.9rem; }
-      .error { color: #b00020; margin-top: 0.5rem; }
-    </style>
-  </head>
-  <body>
-    <h1>CeylonPulse News</h1>
-    <p>Fetch the latest hot news from Ada Derana.</p>
 
-    <div class="controls">
-      <label for="limit">Items:</label>
-      <input id="limit" type="number" min="1" max="50" value="10" />
-      <button id="fetchBtn">Fetch News</button>
-      <span id="status"></span>
-    </div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CeylonPulse News</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 2rem;
+    }
 
-    <div id="error" class="error" hidden></div>
-    <ul id="list"></ul>
+    h1 {
+      margin-bottom: 0.5rem;
+    }
 
-    <script>
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    input[type=number] {
+      width: 6rem;
+      padding: 0.4rem;
+    }
+
+    button {
+      padding: 0.5rem 0.8rem;
+      cursor: pointer;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .date {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .error {
+      color: #b00020;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>CeylonPulse News</h1>
+  <p>Fetch the latest hot news from Ada Derana.</p>
+
+  <div class="controls">
+    <label for="limit">Items:</label>
+    <input id="limit" type="number" min="1" max="50" value="10" />
+    <button id="fetchBtn">Fetch News</button>
+    <span id="status"></span>
+  </div>
+
+  <div id="error" class="error" hidden></div>
+  <ul id="list"></ul>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", start());
+
+    function start(){
       const fetchBtn = document.getElementById('fetchBtn');
       const limitInput = document.getElementById('limit');
       const list = document.getElementById('list');
       const statusEl = document.getElementById('status');
       const errorEl = document.getElementById('error');
-
+  
       async function loadNews() {
         list.innerHTML = '';
         errorEl.hidden = true;
         statusEl.textContent = 'Loading…';
         const limit = Math.max(1, Math.min(1000, Number(limitInput.value || 10)));
-
+  
         try {
           const res = await fetch(`/api/news?limit=${limit}`);
           if (!res.ok) throw new Error(`API error ${res.status}`);
           const data = await res.json();
           statusEl.textContent = `Loaded ${data.count} items`;
-
+  
           for (const item of data.items) {
             const li = document.createElement('li');
             const a = document.createElement('a');
@@ -56,11 +97,11 @@
             a.textContent = item.headline || '(no headline)';
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
-
+  
             const date = document.createElement('div');
             date.className = 'date';
             date.textContent = item.date_time || '';
-
+  
             li.appendChild(a);
             li.appendChild(date);
             list.appendChild(li);
@@ -71,10 +112,13 @@
           errorEl.hidden = false;
         }
       }
-
+  
       fetchBtn.addEventListener('click', loadNews);
+  
       // Initial load
       loadNews();
-    </script>
-  </body>
-  </html>
+    }
+  </script>
+</body>
+
+</html>

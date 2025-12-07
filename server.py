@@ -1,14 +1,43 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, abort
 from api.web_scraper import NewScraper
-scraper = NewScraper()
 import os
 
+scraper = NewScraper()
 app = Flask(__name__, static_folder='.')
+
+# Define the pages directory
+PAGES_DIR = os.path.join(os.path.dirname(__file__), 'pages')
 
 @app.route('/')
 def index():
-    """Serve the main HTML page"""
-    return send_from_directory('.', 'index.html')
+    """Serve the main HTML page from pages folder"""
+    return send_from_directory(PAGES_DIR, 'index.html')
+
+@app.route('/<path:page_name>')
+def serve_page(page_name):
+    """Serve requested pages from the pages folder"""
+    # Skip API routes - they should be handled by API endpoints
+    if page_name.startswith('api/'):
+        abort(404)
+    
+    try:
+        # If no extension, assume .html
+        if '.' not in page_name:
+            page_name = f"{page_name}.html"
+        
+        # Check if file exists in pages directory
+        file_path = os.path.join(PAGES_DIR, page_name)
+        if os.path.isfile(file_path):
+            return send_from_directory(PAGES_DIR, page_name)
+        else:
+            abort(404)
+    except Exception:
+        abort(404)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """Custom 404 error handler"""
+    return send_from_directory(PAGES_DIR, '404.html'), 404
 
 @app.route('/api/news', methods=['GET'])
 def get_news():
