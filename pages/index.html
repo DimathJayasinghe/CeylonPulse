@@ -91,18 +91,21 @@
           statusEl.textContent = `Loaded ${data.count} items`;
   
           for (const item of data.items) {
+            const item_id = document.createElement('div');
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = item.url || '#';
             a.textContent = item.headline || '(no headline)';
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
+            item_id.textContent = "["+item.ID + "] " || '';
   
             const date = document.createElement('div');
             date.className = 'date';
             date.textContent = item.date_time || '';
-  
-            li.appendChild(a);
+            
+            item_id.appendChild(a);
+            li.appendChild(item_id);
             li.appendChild(date);
             list.appendChild(li);
           }
