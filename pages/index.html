@@ -1,127 +1,233 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CeylonPulse News</title>
+  <title>CeylonPulse - Sri Lankan Insights & Analytics</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      margin: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+      animation: fadeInDown 0.8s ease;
     }
 
     h1 {
-      margin-bottom: 0.5rem;
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     }
 
-    .controls {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.95;
       margin-bottom: 1rem;
     }
 
-    input[type=number] {
-      width: 6rem;
-      padding: 0.4rem;
+    .description {
+      font-size: 1rem;
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
     }
 
-    button {
-      padding: 0.5rem 0.8rem;
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
     }
 
-    li {
-      padding: 0.6rem 0;
-      border-bottom: 1px solid #eee;
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease;
     }
 
-    .date {
+    .card:hover .card-icon {
+      transform: scale(1.1);
+    }
+
+    .card-icon.news {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card-icon.currency {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .card-icon.stock {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .card p {
       color: #666;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 25px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .card-button:hover {
+      transform: scale(1.05);
+    }
+
+    .card.currency .card-button {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .card.stock .card-button {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    footer {
+      text-align: center;
+      color: white;
+      margin-top: 4rem;
+      opacity: 0.8;
       font-size: 0.9rem;
     }
 
-    .error {
-      color: #b00020;
-      margin-top: 0.5rem;
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+
+      .cards-container {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
-
 <body>
-  <h1>CeylonPulse News</h1>
-  <p>Fetch the latest hot news from Ada Derana.</p>
+  <div class="container">
+    <header>
+      <h1>🇱🇰 CeylonPulse</h1>
+      <p class="subtitle">Real-time Sri Lankan Insights & Analytics</p>
+      <p class="description">
+        Stay informed with the latest news from Sri Lanka, track currency exchange rates, 
+        and analyze stock market trends. CeylonPulse uses AI-powered categorization to 
+        organize news into Political, Economic, Social, Technological, Environmental, and Legal categories.
+      </p>
+    </header>
 
-  <div class="controls">
-    <label for="limit">Items:</label>
-    <input id="limit" type="number" min="1" max="50" value="10" />
-    <button id="fetchBtn">Fetch News</button>
-    <span id="status"></span>
+    <div class="cards-container">
+      <!-- News Card -->
+      <a href="/news" class="card news">
+        <div class="card-icon news">📰</div>
+        <h2>News Analytics</h2>
+        <p>Get the latest news from Ada Derana with AI-powered PESTLE categorization. Stay updated on Political, Economic, Social, and more.</p>
+        <button class="card-button">Explore News</button>
+      </a>
+
+      <!-- Currency Card -->
+      <a href="/currency" class="card currency">
+        <div class="card-icon currency">💱</div>
+        <h2>Currency Exchange</h2>
+        <p>Track real-time currency exchange rates and predictions. Monitor LKR against major world currencies.</p>
+        <button class="card-button">View Rates</button>
+      </a>
+
+      <!-- Stock Market Card -->
+      <a href="/stockMarket" class="card stock">
+        <div class="card-icon stock">📈</div>
+        <h2>Stock Market</h2>
+        <p>Analyze stock market trends and performance. Get insights into Colombo Stock Exchange with predictive analytics.</p>
+        <button class="card-button">Analyze Market</button>
+      </a>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 CeylonPulse. Empowering decisions with data.</p>
+    </footer>
   </div>
-
-  <div id="error" class="error" hidden></div>
-  <ul id="list"></ul>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", start());
-
-    function start(){
-      const fetchBtn = document.getElementById('fetchBtn');
-      const limitInput = document.getElementById('limit');
-      const list = document.getElementById('list');
-      const statusEl = document.getElementById('status');
-      const errorEl = document.getElementById('error');
-  
-      async function loadNews() {
-        list.innerHTML = '';
-        errorEl.hidden = true;
-        statusEl.textContent = 'Loading…';
-        const limit = Math.max(1, Math.min(1000, Number(limitInput.value || 10)));
-  
-        try {
-          const res = await fetch(`/api/news?limit=${limit}`);
-          if (!res.ok) throw new Error(`API error ${res.status}`);
-          const data = await res.json();
-          statusEl.textContent = `Loaded ${data.count} items`;
-  
-          for (const item of data.items) {
-            const item_id = document.createElement('div');
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = item.url || '#';
-            a.textContent = item.headline || '(no headline)';
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            item_id.textContent = "["+item.ID + "] " || '';
-  
-            const date = document.createElement('div');
-            date.className = 'date';
-            date.textContent = item.date_time || '';
-            
-            item_id.appendChild(a);
-            li.appendChild(item_id);
-            li.appendChild(date);
-            list.appendChild(li);
-          }
-        } catch (err) {
-          statusEl.textContent = '';
-          errorEl.textContent = err.message || 'Failed to load news';
-          errorEl.hidden = false;
-        }
-      }
-  
-      fetchBtn.addEventListener('click', loadNews);
-  
-      // Initial load
-      loadNews();
-    }
-  </script>
 </body>
-
 </html>

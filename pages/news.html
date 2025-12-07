@@ -1,0 +1,421 @@
+
+  <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>News Analytics - CeylonPulse</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .category-nav {
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .category-nav-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      overflow-x: auto;
+      padding: 0.5rem 1rem;
+      gap: 0.5rem;
+    }
+
+    .category-btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      background: #f0f0f0;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .category-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .category-btn.active {
+      color: white;
+    }
+
+    .category-btn.All.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .category-btn.Political.active { background: #f44336; }
+    .category-btn.Economic.active { background: #4caf50; }
+    .category-btn.Social.active { background: #2196f3; }
+    .category-btn.Technological.active { background: #9c27b0; }
+    .category-btn.Environmental.active { background: #8bc34a; }
+    .category-btn.Legal.active { background: #ff9800; }
+
+    .content {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .status-bar {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-info {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .news-list {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-height: 400px;
+    }
+
+    .news-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .news-item:last-child {
+      border-bottom: none;
+    }
+
+    .news-link {
+      color: #1976d2;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.05rem;
+    }
+
+    .news-link:hover {
+      text-decoration: underline;
+    }
+
+    .news-meta {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 0.5rem;
+      align-items: center;
+    }
+
+    .date {
+      color: #666;
+      font-size: 0.85rem;
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge-Economic { background: #c8e6c9; color: #2e7d32; }
+    .badge-Environmental { background: #dcedc8; color: #558b2f; }
+    .badge-Legal { background: #ffe0b2; color: #e65100; }
+    .badge-Political { background: #ffcdd2; color: #c62828; }
+    .badge-Social { background: #bbdefb; color: #1565c0; }
+    .badge-Technological { background: #e1bee7; color: #6a1b9a; }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      padding-bottom: 2rem;
+    }
+
+    .pagination button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: #667eea;
+      color: white;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-info {
+      padding: 0.6rem 1rem;
+      background: white;
+      border-radius: 6px;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .error {
+      color: #b00020;
+      padding: 1rem;
+      background: #ffebee;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #999;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .category-nav-content {
+        padding: 0.5rem;
+      }
+
+      .category-btn {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <h1>📰 News Analytics</h1>
+      <p class="subtitle">AI-powered PESTLE categorization of Sri Lankan news</p>
+    </div>
+  </div>
+
+  <nav class="category-nav">
+    <div class="category-nav-content" id="categoryNav">
+      <button class="category-btn All active" data-category="All">All News</button>
+      <button class="category-btn Political" data-category="Political">Political</button>
+      <button class="category-btn Economic" data-category="Economic">Economic</button>
+      <button class="category-btn Social" data-category="Social">Social</button>
+      <button class="category-btn Technological" data-category="Technological">Technological</button>
+      <button class="category-btn Environmental" data-category="Environmental">Environmental</button>
+      <button class="category-btn Legal" data-category="Legal">Legal</button>
+    </div>
+  </nav>
+
+  <div class="content">
+    <div class="status-bar">
+      <div class="status-info" id="statusInfo">Loading news...</div>
+      <a href="/" style="text-decoration: none; color: #667eea; font-weight: 500;">← Back to Home</a>
+    </div>
+
+    <div id="error" class="error" hidden></div>
+    
+    <div class="news-list" id="newsList">
+      <div class="loading">Loading news...</div>
+    </div>
+
+    <div class="pagination" id="pagination" hidden>
+      <button id="prevBtn">← Previous</button>
+      <span class="page-info" id="pageInfo">Page 1</span>
+      <button id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <script>
+    let allNews = [];
+    let currentPage = 1;
+    let currentCategory = 'All';
+    const itemsPerPage = 10;
+
+    const categoryNav = document.getElementById('categoryNav');
+    const newsList = document.getElementById('newsList');
+    const statusInfo = document.getElementById('statusInfo');
+    const errorEl = document.getElementById('error');
+    const pagination = document.getElementById('pagination');
+    const pageInfo = document.getElementById('pageInfo');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    // Category button click handlers
+    categoryNav.addEventListener('click', (e) => {
+      if (e.target.classList.contains('category-btn')) {
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentCategory = e.target.dataset.category;
+        currentPage = 1;
+        displayNews();
+      }
+    });
+
+    // Pagination handlers
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        loadMoreIfNeeded();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentPage++;
+      loadMoreIfNeeded();
+    });
+
+    async function loadMoreIfNeeded() {
+      const filteredNews = getFilteredNews();
+      const totalNeeded = currentPage * itemsPerPage;
+      
+      if (filteredNews.length < totalNeeded && allNews.length < totalNeeded) {
+        await fetchNews(totalNeeded);
+      }
+      displayNews();
+    }
+
+    async function fetchNews(limit) {
+      try {
+        statusInfo.textContent = 'Loading news...';
+        const res = await fetch(`/api/news?limit=${limit}`);
+        if (!res.ok) throw new Error(`API error ${res.status}`);
+        const data = await res.json();
+        
+        // Avoid duplicates by checking IDs
+        const existingIds = new Set(allNews.map(item => item.ID));
+        const newItems = data.items.filter(item => !existingIds.has(item.ID));
+        allNews = [...allNews, ...newItems];
+        
+        errorEl.hidden = true;
+      } catch (err) {
+        errorEl.textContent = err.message || 'Failed to load news';
+        errorEl.hidden = false;
+      }
+    }
+
+    function getFilteredNews() {
+      if (currentCategory === 'All') return allNews;
+      return allNews.filter(item => item.category === currentCategory);
+    }
+
+    function displayNews() {
+      const filteredNews = getFilteredNews();
+      const startIdx = (currentPage - 1) * itemsPerPage;
+      const endIdx = startIdx + itemsPerPage;
+      const pageNews = filteredNews.slice(startIdx, endIdx);
+
+      // Update status
+      const categoryText = currentCategory === 'All' ? 'All Categories' : currentCategory;
+      statusInfo.textContent = `Showing ${filteredNews.length} news items in ${categoryText}`;
+
+      // Clear and populate news list
+      newsList.innerHTML = '';
+      
+      if (pageNews.length === 0) {
+        newsList.innerHTML = '<div class="empty-state">No news items found for this category.</div>';
+        pagination.hidden = true;
+        return;
+      }
+
+      pageNews.forEach(item => {
+        const newsItem = document.createElement('div');
+        newsItem.className = 'news-item';
+        
+        const link = document.createElement('a');
+        link.className = 'news-link';
+        link.href = item.url || '#';
+        link.textContent = item.headline || '(no headline)';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        
+        const meta = document.createElement('div');
+        meta.className = 'news-meta';
+        
+        const date = document.createElement('span');
+        date.className = 'date';
+        date.textContent = item.date_time || '';
+        
+        const badge = document.createElement('span');
+        badge.className = `category-badge badge-${item.category}`;
+        badge.textContent = item.category;
+        
+        meta.appendChild(date);
+        meta.appendChild(badge);
+        
+        newsItem.appendChild(link);
+        newsItem.appendChild(meta);
+        newsList.appendChild(newsItem);
+      });
+
+      // Update pagination
+      const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage >= totalPages;
+      pagination.hidden = false;
+    }
+
+    // Initial load with progressive loading
+    (async () => {
+      // First load 100 items quickly
+      await fetchNews(100);
+      displayNews();
+      
+      // Then load remaining 900 items in background
+      statusInfo.textContent = 'Loading more news in background...';
+      await fetchNews(1000);
+      displayNews();
+    })();
+  </script>
+</body>
+</html>

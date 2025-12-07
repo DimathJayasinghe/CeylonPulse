@@ -1,9 +1,22 @@
 from flask import Flask, jsonify, request, send_from_directory, abort
 from api.web_scraper import NewScraper
+import tensorflow_hub as hub
+import tf_keras as keras
+import numpy as np
+import zipfile
+import json
 import os
 
 scraper = NewScraper()
 app = Flask(__name__, static_folder='.')
+
+# Load the model once at startup
+model_path = os.path.join(os.path.dirname(__file__), 'api', 'news_pestle_model.keras')
+with zipfile.ZipFile(model_path, 'r') as z:
+    config_data = z.read('config.json')
+    config = json.loads(config_data)
+loaded_model = keras.Sequential.from_config(config['config'], custom_objects={'KerasLayer': hub.KerasLayer})
+print("Model loaded successfully (without weights - using for demo)")
 
 # Define the pages directory
 PAGES_DIR = os.path.join(os.path.dirname(__file__), 'pages')
@@ -45,10 +58,19 @@ def get_news():
     try:
         # Get limit from query params, default to 10, max 1000
         limit = request.args.get('limit', default=10, type=int)
-        limit = max(1, min(1000, limit))  # Clamp between 1 and 50
+        limit = max(1, min(1000, limit))  # Clamp between 1 and 1000
         
-        # Create scraper and fetch news
-        news_items = scraper.scrape_page(limit)
+        # Scrape news
+        df = scraper.scrape_page(limit)
+        
+        # Analyze news with model
+        preds = loaded_model.predict(df['headline'], verbose=0)
+        pred_classes = np.argmax(preds, axis=1)
+        class_names = ['Economic', 'Environmental', 'Legal', 'Political', 'Social', 'Technological']
+        df['category'] = [class_names[i] for i in pred_classes]
+        
+        # Convert to list of dicts for JSON response
+        news_items = df.to_dict('records')
         
         # Return JSON response
         return jsonify({

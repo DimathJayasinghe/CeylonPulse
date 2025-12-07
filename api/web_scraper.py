@@ -5,15 +5,13 @@ import pandas as pd
 class NewScraper:
     def __init__(self, page_url="https://www.adaderana.lk/hot-news/?pageno={}"):
         self.page_url = page_url
-        self.all_news = []
 
     def scrape_page(self, limit):
+        all_news = []
         """Scrape the first `limit` news items across multiple pages."""
         # Safeguard limit
         limit = min(1000,limit)
         print(f"Scraping up to {limit} news items...")
-        # Clear previous data before new scrape
-        self.all_news = []
         
         page_no = 1  # Adaderana starts at page 1
         collected = 0
@@ -53,7 +51,7 @@ class NewScraper:
                         date_time_text = span.text.strip().lstrip("|").strip()
 
                 # Save entry
-                self.all_news.append({
+                all_news.append({
                     "ID": collected + 1,
                     "date_time": date_time_text,
                     "headline": headline,
@@ -64,12 +62,7 @@ class NewScraper:
 
             page_no += 1
 
-        return self.all_news
-
-    def save_to_excel(self):
-        df = pd.DataFrame(self.all_news)
-        df.to_excel("adaderana_news_test.xlsx", index=False)
-        print("Done! Saved as adaderana_news_test.xlsx")
+        return pd.DataFrame(all_news)
 
 
 if __name__ == "__main__":
