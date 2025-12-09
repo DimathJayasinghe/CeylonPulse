@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Currency Exchange - CeylonPulse</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .content {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      text-decoration: none;
+      color: #f5576c;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: #f093fb;
+    }
+
+    .rate-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .rate-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .rate-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .period-selector {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .period-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: #f0f0f0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .period-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .period-btn.active {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+
+    .rate-display {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .rate-value {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .rate-label {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .rate-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .rate-change {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .rate-change.positive {
+      color: #4caf50;
+    }
+
+    .rate-change.negative {
+      color: #f44336;
+    }
+
+    .chart-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 400px;
+    }
+
+    .info-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .info-card-title {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-card-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .error {
+      color: #b00020;
+      padding: 1rem;
+      background: #ffebee;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .rate-number {
+        font-size: 2rem;
+      }
+
+      .chart-wrapper {
+        height: 300px;
+      }
+
+      .period-btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <h1>💱 Currency Exchange</h1>
+      <p class="subtitle">USD/LKR Exchange Rate Tracking</p>
+    </div>
+  </div>
+
+  <div class="content">
+    <a href="/" class="back-link">← Back to Home</a>
+
+    <div id="error" class="error" hidden></div>
+
+    <div class="rate-card">
+      <div class="rate-header">
+        <h2 class="rate-title">Current Exchange Rate</h2>
+        <div class="period-selector">
+          <!-- <button class="period-btn" data-period="1d">1 Day</button> -->
+          <button class="period-btn" data-period="5d">5 Days</button>
+          <button class="period-btn active" data-period="1mo">1 Month</button>
+          <button class="period-btn" data-period="3mo">3 Months</button>
+          <button class="period-btn" data-period="6mo">6 Months</button>
+          <button class="period-btn" data-period="1y">1 Year</button>
+        </div>
+      </div>
+
+      <div class="rate-display">
+        <div class="rate-value">
+          <div class="rate-label">1 USD =</div>
+          <div class="rate-number" id="currentRate">-</div>
+          <div class="rate-change" id="rateChange">
+            <span id="changeValue">-</span>
+            <span id="changePercent">(-)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-card-title">Highest (Period)</div>
+        <div class="info-card-value" id="highestRate">-</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Lowest (Period)</div>
+        <div class="info-card-value" id="lowestRate">-</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Average</div>
+        <div class="info-card-value" id="avgRate">-</div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <h3 style="margin-bottom: 1.5rem; color: #333;">Exchange Rate History</h3>
+      <div class="chart-wrapper">
+        <canvas id="currencyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let chart = null;
+    let currentPeriod = '1mo';
+
+    const errorEl = document.getElementById('error');
+    const currentRateEl = document.getElementById('currentRate');
+    const rateChangeEl = document.getElementById('rateChange');
+    const changeValueEl = document.getElementById('changeValue');
+    const changePercentEl = document.getElementById('changePercent');
+    const highestRateEl = document.getElementById('highestRate');
+    const lowestRateEl = document.getElementById('lowestRate');
+    const avgRateEl = document.getElementById('avgRate');
+
+    // Period button handlers
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPeriod = btn.dataset.period;
+        loadCurrencyData();
+      });
+    });
+
+    async function loadCurrencyData() {
+      try {
+        errorEl.hidden = true;
+        const res = await fetch(`/api/currency?period=${currentPeriod}`);
+        if (!res.ok) throw new Error(`API error ${res.status}`);
+        const data = await res.json();
+
+        if (data.status !== 'success') {
+          throw new Error(data.message || 'Failed to load data');
+        }
+
+        // Update current rate display
+        currentRateEl.textContent = `${data.current_rate.toFixed(2)} LKR`;
+        
+        // Update change display
+        const isPositive = data.change >= 0;
+        rateChangeEl.className = `rate-change ${isPositive ? 'positive' : 'negative'}`;
+        changeValueEl.textContent = `${isPositive ? '+' : ''}${data.change.toFixed(4)}`;
+        changePercentEl.textContent = `(${isPositive ? '+' : ''}${data.change_percent.toFixed(2)}%)`;
+
+        // Calculate statistics
+        const rates = data.data.map(d => d.rate);
+        const highest = Math.max(...rates);
+        const lowest = Math.min(...rates);
+        const average = rates.reduce((a, b) => a + b, 0) / rates.length;
+
+        highestRateEl.textContent = `${highest.toFixed(2)} LKR`;
+        lowestRateEl.textContent = `${lowest.toFixed(2)} LKR`;
+        avgRateEl.textContent = `${average.toFixed(2)} LKR`;
+
+        // Update chart
+        updateChart(data.data);
+
+      } catch (err) {
+        errorEl.textContent = err.message || 'Failed to load currency data';
+        errorEl.hidden = false;
+      }
+    }
+
+    function updateChart(data) {
+      const ctx = document.getElementById('currencyChart').getContext('2d');
+
+      if (chart) {
+        chart.destroy();
+      }
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(d => d.date),
+          datasets: [{
+            label: 'USD/LKR Exchange Rate',
+            data: data.map(d => d.rate),
+            borderColor: 'rgba(240, 147, 251, 1)',
+            backgroundColor: 'rgba(240, 147, 251, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 2,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top'
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                label: function(context) {
+                  return `Rate: ${context.parsed.y.toFixed(4)} LKR`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Date'
+              },
+              ticks: {
+                maxTicksLimit: 10
+              }
+            },
+            y: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Exchange Rate (LKR)'
+              },
+              ticks: {
+                callback: function(value) {
+                  return value.toFixed(2);
+                }
+              }
+            }
+          },
+          interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false
+          }
+        }
+      });
+    }
+
+    // Initial load
+    loadCurrencyData();
+  </script>
+</body>
+</html>
