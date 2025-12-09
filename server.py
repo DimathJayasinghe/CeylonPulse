@@ -6,6 +6,7 @@ import numpy as np
 import zipfile
 import json
 import os
+import yfinance as yf
 
 scraper = NewScraper()
 app = Flask(__name__, static_folder='.')
@@ -15,7 +16,7 @@ model_path = os.path.join(os.path.dirname(__file__), 'api', 'news_pestle_model.k
 with zipfile.ZipFile(model_path, 'r') as z:
     config_data = z.read('config.json')
     config = json.loads(config_data)
-loaded_model = keras.Sequential.from_config(config['config'], custom_objects={'KerasLayer': hub.KerasLayer})
+# loaded_model = keras.Sequential.from_config(config['config'], custom_objects={'KerasLayer': hub.KerasLayer})
 print("Model loaded successfully (without weights - using for demo)")
 
 # Define the pages directory
@@ -81,6 +82,55 @@ def get_news():
         
     except Exception as e:
         # Handle errors and return error response
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/api/currency', methods=['GET'])
+def get_currency():
+    """API endpoint to fetch USD/LKR exchange rate data"""
+    try:
+        # Get period from query params (default 1 month)
+        period = request.args.get('period', default='1mo', type=str)
+        
+        # Valid periods: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, max
+        valid_periods = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', 'max']
+        if period not in valid_periods:
+            period = '1mo'
+        
+        # Fetch USD/LKR data from Yahoo Finance
+        ticker = yf.Ticker('LKR=X')
+        hist = ticker.history(period=period)
+        
+        # Convert to list of dicts
+        data = []
+        for date, row in hist.iterrows():
+            data.append({
+                'date': date.strftime('%Y-%m-%d'),
+                'rate': round(row['Close'], 4),
+                'open': round(row['Open'], 4),
+                'high': round(row['High'], 4),
+                'low': round(row['Low'], 4),
+                'volume': int(row['Volume']) if row['Volume'] > 0 else 0
+            })
+        
+        # Get current rate
+        current_rate = data[-1]['rate'] if data else 0
+        previous_rate = data[-2]['rate'] if len(data) > 1 else current_rate
+        change = current_rate - previous_rate
+        change_percent = (change / previous_rate * 100) if previous_rate != 0 else 0
+        
+        return jsonify({
+            'status': 'success',
+            'current_rate': current_rate,
+            'change': round(change, 4),
+            'change_percent': round(change_percent, 2),
+            'period': period,
+            'data': data
+        }), 200
+        
+    except Exception as e:
         return jsonify({
             'status': 'error',
             'message': str(e)
