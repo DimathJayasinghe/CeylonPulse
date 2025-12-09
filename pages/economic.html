@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Economic Indicators - CeylonPulse</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      color: white;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .content {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      text-decoration: none;
+      color: #43e97b;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: #38f9d7;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-box h3 {
+      color: #00695c;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-box p {
+      color: #424242;
+      line-height: 1.6;
+    }
+
+    .error {
+      color: #b00020;
+      padding: 1rem;
+      background: #ffebee;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .indicators-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .indicator-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .indicator-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .indicator-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .indicator-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-right: 1rem;
+    }
+
+    .indicator-icon.gdp {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .indicator-icon.ccpi {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .indicator-icon.ncpi {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .indicator-title {
+      flex: 1;
+    }
+
+    .indicator-name {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    .indicator-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .indicator-details {
+      margin-top: 1.5rem;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .trend-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .trend-badge.growing,
+    .trend-badge.falling {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .trend-badge.rising {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .trend-badge.contracting {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .trend-badge.stable {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .sentiment-box {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 8px;
+      border-left: 4px solid #43e97b;
+    }
+
+    .sentiment-label {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    .sentiment-value {
+      font-weight: 600;
+      color: #333;
+      font-size: 0.95rem;
+    }
+
+    .update-time {
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .indicator-value {
+        font-size: 1.5rem;
+      }
+
+      .indicators-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <h1>📊 Economic Indicators</h1>
+      <p class="subtitle">Track Sri Lanka's Key Economic Metrics</p>
+    </div>
+  </div>
+
+  <div class="content">
+    <a href="/" class="back-link">← Back to Home</a>
+
+    <div class="info-box">
+      <h3>About These Indicators</h3>
+      <p>
+        Monitor Sri Lanka's economic health through key indicators including GDP growth, inflation rates, 
+        unemployment, interest rates, trade balance, government debt, and tax rates. Data is sourced from 
+        Trading Economics and updated regularly.
+      </p>
+    </div>
+
+    <div id="error" class="error" hidden></div>
+    <div id="loading" class="loading">Loading economic indicators...</div>
+
+    <div id="indicatorsContainer" class="indicators-grid" style="display: none;"></div>
+
+    <div id="updateTime" class="update-time" style="display: none;"></div>
+  </div>
+
+  <script>
+    const errorEl = document.getElementById('error');
+    const loadingEl = document.getElementById('loading');
+    const containerEl = document.getElementById('indicatorsContainer');
+    const updateTimeEl = document.getElementById('updateTime');
+
+    const iconMap = {
+      'GDP Annual Growth Rate': { icon: '📈', class: 'gdp' },
+      'Unemployment Rate': { icon: '👥', class: 'ccpi' },
+      'Inflation Rate': { icon: '💰', class: 'ncpi' },
+      'Interest Rate': { icon: '🏦', class: 'gdp' },
+      'Balance of Trade': { icon: '⚖️', class: 'ccpi' },
+      'Current Account': { icon: '💵', class: 'ncpi' },
+      'Current Account to GDP': { icon: '📊', class: 'gdp' },
+      'Government Debt to GDP': { icon: '🏛️', class: 'ccpi' },
+      'Government Budget': { icon: '💼', class: 'ncpi' },
+      'Corporate Tax Rate': { icon: '🏢', class: 'gdp' },
+      'Personal Income Tax Rate': { icon: '👤', class: 'ccpi' }
+    };
+
+    async function loadEconomicData() {
+      try {
+        errorEl.hidden = true;
+        loadingEl.style.display = 'block';
+        containerEl.style.display = 'none';
+
+        const res = await fetch('/api/economic');
+        if (!res.ok) throw new Error(`API error ${res.status}`);
+        const data = await res.json();
+
+        if (data.status !== 'success') {
+          throw new Error(data.message || 'Failed to load data');
+        }
+
+        loadingEl.style.display = 'none';
+        containerEl.style.display = 'grid';
+        
+        // Clear container
+        containerEl.innerHTML = '';
+
+        // Create cards for each indicator
+        data.indicators.forEach(indicator => {
+          const info = iconMap[indicator.indicator] || { icon: '📊', class: 'gdp' };
+          const card = createIndicatorCard(indicator, info);
+          containerEl.appendChild(card);
+        });
+
+        // Show update time
+        updateTimeEl.style.display = 'block';
+        updateTimeEl.textContent = `Data sourced from Trading Economics • Last updated: ${new Date().toLocaleString()}`;
+
+      } catch (err) {
+        loadingEl.style.display = 'none';
+        errorEl.textContent = err.message || 'Failed to load economic indicators';
+        errorEl.hidden = false;
+      }
+    }
+
+    function createIndicatorCard(indicator, info) {
+      const card = document.createElement('div');
+      card.className = 'indicator-card';
+
+      const trendClass = indicator.trend.toLowerCase().replace(/\s+/g, '-');
+      const displayValue = indicator.unit ? `${indicator.last_value} ${indicator.unit}` : indicator.last_value;
+      
+      card.innerHTML = `
+        <div class="indicator-header">
+          <div class="indicator-icon ${info.class}">${info.icon}</div>
+          <div class="indicator-title">
+            <div class="indicator-name">${indicator.indicator}</div>
+            <div class="indicator-value">${displayValue}</div>
+          </div>
+        </div>
+
+        <div class="indicator-details">
+          ${indicator.previous_value !== null ? `
+          <div class="detail-row">
+            <span class="detail-label">Previous</span>
+            <span class="detail-value">${indicator.previous_value}${indicator.unit ? ' ' + indicator.unit : ''}</span>
+          </div>
+          ` : ''}
+          ${indicator.highest_value !== null ? `
+          <div class="detail-row">
+            <span class="detail-label">Highest</span>
+            <span class="detail-value">${indicator.highest_value}${indicator.unit ? ' ' + indicator.unit : ''}</span>
+          </div>
+          ` : ''}
+          ${indicator.lowest_value !== null ? `
+          <div class="detail-row">
+            <span class="detail-label">Lowest</span>
+            <span class="detail-value">${indicator.lowest_value}${indicator.unit ? ' ' + indicator.unit : ''}</span>
+          </div>
+          ` : ''}
+          <div class="detail-row">
+            <span class="detail-label">Trend</span>
+            <span class="trend-badge ${trendClass}">${indicator.trend}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">${indicator.date}</span>
+          </div>
+        </div>
+
+        <div class="sentiment-box">
+          <div class="sentiment-label">Analysis</div>
+          <div class="sentiment-value">${indicator.sentiment}</div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    // Load data on page load
+    loadEconomicData();
+
+    // Refresh every 5 minutes
+    setInterval(loadEconomicData, 5 * 60 * 1000);
+  </script>
+</body>
+</html>

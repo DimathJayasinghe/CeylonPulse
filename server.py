@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, send_from_directory, abort
-from api.web_scraper import NewScraper, CSEScraper
+from api.web_scraper import NewScraper, CSEScraper, EconomicIndicatorsScraper
 import tensorflow_hub as hub
 import tf_keras as keras
 import numpy as np
@@ -10,6 +10,7 @@ import yfinance as yf
 
 scraper = NewScraper()
 cse_scraper = CSEScraper()
+econ_scraper = EconomicIndicatorsScraper()
 app = Flask(__name__, static_folder='.')
 
 # Load the model once at startup
@@ -70,7 +71,6 @@ def get_news():
         pred_classes = np.argmax(preds, axis=1)
         class_names = ['Economic', 'Environmental', 'Legal', 'Political', 'Social', 'Technological']
         df['category'] = [class_names[i] for i in pred_classes]
-        
         # Convert to list of dicts for JSON response
         news_items = df.to_dict('records')
         
@@ -203,6 +203,31 @@ def get_stock():
             'change_percent': round(change_percent, 2),
             'period': period,
             'data': data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error: {str(e)}'
+        }), 500
+
+@app.route('/api/economic', methods=['GET'])
+def get_economic_indicators():
+    """API endpoint to fetch economic indicators (GDP, CCPI, NCPI)"""
+    try:
+        # Fetch data from Trading Economics
+        data = econ_scraper.fetch_economic_indicators()
+        
+        if not data or len(data) == 0:
+            return jsonify({
+                'status': 'error',
+                'message': 'Unable to fetch economic indicators. Please try again later.'
+            }), 200
+        
+        return jsonify({
+            'status': 'success',
+            'count': len(data),
+            'indicators': data
         }), 200
         
     except Exception as e:
